@@ -1,0 +1,15 @@
+1.display all pods
+
+kubectl get pods  
+
+2.display pods with detail 
+
+kubectl get pods -o wide
+
+3.display events
+
+kubectl get events
+
+4. creating yAML using command dryrun ( dry-run) option 
+
+kubectl run redis --image=redis123 --dry-run=client -o yaml > redis.yaml

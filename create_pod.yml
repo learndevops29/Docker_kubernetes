@@ -1,1 +1,14 @@
-apiVersion: V1
+apiVersion: v1
+kind: Pod
+metadata:
+
+  name: nginx #name of pod
+  labels:
+    app: nginx1
+    tier: frontend
+spec:
+  containers:
+
+    - name: nginix-app #name of container withing pod , multiple cntainer can be in a pod with diffrent name
+      image: nginx:latest
+
