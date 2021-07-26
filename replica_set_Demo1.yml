@@ -1,34 +1,22 @@
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-  name: MYAPP
+  name: myapp-rc
   labels:
-    app: MYAPP
+    app: myapp-rc
+    type: front-end
 spec:
-  # modify replicas according to your case
-  replicas: 3
-  selector:
-    matchLabels:
-      app: MYAPP
+
   template:
     metadata:
+      name: myapp-pod
       labels:
-        app: MYAPP
+        app: myapp-pod
+        type: front-end
     spec:
       containers:
-      - name: MYAPP
-        image: nginx/nginx
-        ports:
-        - name: web
-          containerPort:  80
-          protocol: TCP
-        env:
-        - name: NGX_VERSION
-          value: 1.16.1
-        volumeMounts:
-        - name: localtime
-          mountPath: /etc/localtime
-      volumes:
-        - name: localtime
-          hostPath:
-            path: /usr/share/zoneinfo/Asia/Shanghai
+        - name: redis-container
+          image: redis
+  replicas: 3
+    matchLabels: 
+      app: myapp-pod

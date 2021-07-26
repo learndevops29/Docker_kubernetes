@@ -32,6 +32,18 @@ kubectl replace -f replicaset-definition.yml
 
 9. scal up down replicaset 
 
-kubectl scale -replicas=6 -f replicas-definitions.yml
+kubectl scale --replicas=0 -f replicaset_demo2.yaml
+
+10 scal up down otherway 
+
+kubectl scale replicaset myapp-replicaset --replicas=2
+
+11: describe replicaset
+
+kubectl describe replicaset myapp-replicaset 
+
+12: edit the replicaset on go 
+
+kubectl edit replicaset <replicaset-name>
 
 
