@@ -13,3 +13,25 @@ kubectl get events
 4. creating yAML using command dryrun ( dry-run) option 
 
 kubectl run redis --image=redis123 --dry-run=client -o yaml > redis.yaml
+
+5. create replica set
+
+kubectl create -f replicaset-definition.yml
+
+6. get replicas status
+
+kubectl get replicaset
+
+7. Deleting replica set 
+
+kubectl delete replicaset <name of replicaset>
+
+8. replace replica set
+
+kubectl replace -f replicaset-definition.yml
+
+9. scal up down replicaset 
+
+kubectl scale -replicas=6 -f replicas-definitions.yml
+
+
