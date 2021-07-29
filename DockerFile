@@ -1,0 +1,49 @@
+FROM centos:7.9.2009
+
+ARG SERVER_TO_AGENT="9006"
+ARG AGENT_TO_SERVER="9005"
+ARG PRIMARY_CTM_SERVER="server1"
+ARG AUTHORIZED_CTM_SERVER="server2"
+
+ENV SERVER_TO_AGENT=${SERVER_TO_AGENT}
+ENV AGENT_TO_SERVER=${AGENT_TO_SERVER}
+ENV PRIMARY_CTM_SERVER=${PRIMARY_CTM_SERVER}
+ENV AUTHORIZED_CTM_SERVER=${AUTHORIZED_CTM_SERVER}
+
+RUN useradd -m -d /home/ctmagent ctmagent
+
+RUN mkdir -p /home/ctmagent/temp
+RUN cd /home/ctmagent/temp
+RUN yum install wget net-tools java-1.8.0-openjdk -y
+
+RUN wget -o /home/ctmagent/temp/DRKAI.9.0.19.200_Linux-x86_64.tar.Z https://192.168.1.129:8443/automation-api/DRKAI.9.0.19.200_Linux-x86_64.tar.Z --no-check-certificate
+
+COPY installation.xml /home/ctmagent/temp/
+
+#RUN SERVER_TO_AGENT=${SERVER_TO_AGENT}
+#RUN AGENT_TO_SERVER=${AGENT_TO_SERVER}
+#RUN PRIMARY_CTM_SERVER=${PRIMARY_CTM_SERVER}
+#RUN AUTHORIZED_CTM_SERVER=${AUTHORIZED_CTM_SERVER}
+
+RUN echo "${AGENT_TO_SERVER} , ${SERVER_TO_AGENT} , ${PRIMARY_CTM_SERVER} , ${AUTHORIZED_CTM_SERVER} " > home/ctmagent/values
+RUN env > home/ctmagent/valuesenv1
+RUN sed -i "s/SERVER_TO_AGENT/$SERVER_TO_AGENT/g" /home/ctmagent/temp/installation.xml
+RUN sed -i "s/AGENT_TO_SERVER/$AGENT_TO_SERVER/g" /home/ctmagent/temp/installation.xml
+RUN sed -i "s/PRIMARY_CTM_SERVER/$PRIMARY_CTM_SERVER/g" /home/ctmagent/temp/installation.xml
+RUN sed -i "s/AUTHORIZED_CTM_SERVER/$AUTHORIZED_CTM_SERVER/g" /home/ctmagent/temp/installation.xml
+RUN cp -rp /home/ctmagent/temp/installation.xml /home/ctmagent/installation.xml
+RUN tar -xzvf DRKAI.9.0.19.200_Linux-x86_64.tar.Z -C /home/ctmagent/temp/
+
+RUN cd /home/ctmagent/ && sh /home/ctmagent/temp/setup.sh -silent /home/ctmagent/temp/installation.xml
+
+EXPOSE 7000-9900
+
+#RUN rm -rf /home/ctmagent/temp
+
+#RUN su - ctmagent
+RUN env > home/ctmagent/valuesenv2
+#CMD ["ag_diag_comm"]
+
+
+
+
