@@ -46,4 +46,34 @@ kubectl describe replicaset myapp-replicaset
 
 kubectl edit replicaset <replicaset-name>
 
+29/07/2021
+
+13: create deployment using yaml file
+
+kubectl create -f deployment.yaml
+
+14: get deployment status 
+
+kubectl get deployment
+
+15: all status 
+kubectl get all
+
+16: describe deployement
+
+kubectl describe deployment myapp-deployment
+
+17: directly doing deployment 
+
+syntax: kubectl create deployment <deployment name> --image=<imagename>
+
+kubectl create deployment httpd-frontend --image=httpd:2.4-alpine
+
+18 : scale deployment 
+
+kubectl scale deployment --replicas=3 httpd-frontend
+
+19: edit the deployment 
+syntax: kubectl edit deployment <deployment name>
+kubectl edit deployment httpd-frontend
 
