@@ -1,79 +1,230 @@
 1.display all pods
 
 kubectl get pods  
-
+##########################################################
 2.display pods with detail 
 
 kubectl get pods -o wide
-
+##########################################################
 3.display events
 
 kubectl get events
-
+##########################################################
 4. creating yAML using command dryrun ( dry-run) option 
 
 kubectl run redis --image=redis123 --dry-run=client -o yaml > redis.yaml
-
+##########################################################
 5. create replica set
 
 kubectl create -f replicaset-definition.yml
-
+##########################################################
 6. get replicas status
 
 kubectl get replicaset
-
+##########################################################
 7. Deleting replica set 
 
 kubectl delete replicaset <name of replicaset>
-
+##########################################################
 8. replace replica set
 
 kubectl replace -f replicaset-definition.yml
-
+##########################################################
 9. scal up down replicaset 
 
 kubectl scale --replicas=0 -f replicaset_demo2.yaml
-
+##########################################################
 10 scal up down otherway 
 
 kubectl scale replicaset myapp-replicaset --replicas=2
-
+##########################################################
 11: describe replicaset
 
 kubectl describe replicaset myapp-replicaset 
-
+##########################################################
 12: edit the replicaset on go 
 
 kubectl edit replicaset <replicaset-name>
-
+##########################################################
 29/07/2021
+##########################################################
 
 13: create deployment using yaml file
 
 kubectl create -f deployment.yaml
-
+##########################################################
 14: get deployment status 
 
 kubectl get deployment
-
+##########################################################
 15: all status 
 kubectl get all
 
 16: describe deployement
-
+##########################################################
 kubectl describe deployment myapp-deployment
-
+##########################################################
 17: directly doing deployment 
-
+##########################################################
 syntax: kubectl create deployment <deployment name> --image=<imagename>
 
 kubectl create deployment httpd-frontend --image=httpd:2.4-alpine
-
+##########################################################
 18 : scale deployment 
 
 kubectl scale deployment --replicas=3 httpd-frontend
-
+##########################################################
 19: edit the deployment 
 syntax: kubectl edit deployment <deployment name>
 kubectl edit deployment httpd-frontend
+##########################################################
+30/07/20201
+##########################################################
+20 deployment / rollout and upgrade
 
+syntax - kubectl rollout status <deploymentname>
+e.g. - kubectl rollout status deployment.apps/myapp-deployment
+
+Examlple :-
+
+[cshakya@learndevops deployment]$ kubectl get all
+NAME                                    READY   STATUS              RESTARTS   AGE
+pod/myapp-deployment-6f8c89fb9c-brt7m   0/1     ContainerCreating   0          10s
+pod/myapp-deployment-6f8c89fb9c-g2qlh   0/1     ContainerCreating   0          10s
+pod/myapp-deployment-6f8c89fb9c-lp28x   1/1     Running             0          10s
+pod/myapp-deployment-6f8c89fb9c-p8f7p   0/1     ContainerCreating   0          10s
+pod/myapp-deployment-6f8c89fb9c-sxg6q   0/1     ContainerCreating   0          10s
+pod/myapp-deployment-6f8c89fb9c-z8s6j   0/1     ContainerCreating   0          10s
+
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   3d12h
+
+NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/myapp-deployment   1/6     6            1           10s
+
+NAME                                          DESIRED   CURRENT   READY   AGE
+replicaset.apps/myapp-deployment-6f8c89fb9c   6         6         1       10s
+[cshakya@learndevops deployment]$ kubectl rollout status deployment.apps/myapp-deployment
+Waiting for deployment "myapp-deployment" rollout to finish: 4 of 6 updated replicas are available...
+Waiting for deployment "myapp-deployment" rollout to finish: 5 of 6 updated replicas are available...
+deployment "myapp-deployment" successfully rolled out
+##########################################################
+21: history of changes in rollout 
+
+[cshakya@learndevops deployment]$ kubectl rollout history deployment.apps/myapp-deployment
+deployment.apps/myapp-deployment
+REVISION  CHANGE-CAUSE
+1         <none>
+
+##########################################################
+22: recording the history 
+
+with option --record while creating :-
+kubectl create -f deployment.yaml --record
+
+now the result is like :-
+
+[cshakya@learndevops deployment]$ kubectl rollout history deployment.apps/myapp-deployment
+deployment.apps/myapp-deployment
+REVISION  CHANGE-CAUSE
+1         kubectl create --filename=deployment.yaml --record=true
+##########################################################
+23: after updating image in deployment 
+
+
+OldReplicaSets:  myapp-deployment-6f8c89fb9c (1/1 replicas created)
+NewReplicaSet:   myapp-deployment-f5877d47b (5/5 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  30m   deployment-controller  Scaled up replica set myapp-deployment-6f8c89fb9c to 5
+  Normal  ScalingReplicaSet  16s   deployment-controller  Scaled up replica set myapp-deployment-f5877d47b to 2
+  Normal  ScalingReplicaSet  16s   deployment-controller  Scaled down replica set myapp-deployment-6f8c89fb9c to 4
+  Normal  ScalingReplicaSet  16s   deployment-controller  Scaled up replica set myapp-deployment-f5877d47b to 3
+  Normal  ScalingReplicaSet  11s   deployment-controller  Scaled down replica set myapp-deployment-6f8c89fb9c to 3
+  Normal  ScalingReplicaSet  11s   deployment-controller  Scaled up replica set myapp-deployment-f5877d47b to 4
+  Normal  ScalingReplicaSet  6s    deployment-controller  Scaled down replica set myapp-deployment-6f8c89fb9c to 2
+  Normal  ScalingReplicaSet  6s    deployment-controller  Scaled up replica set myapp-deployment-f5877d47b to 5
+  Normal  ScalingReplicaSet  2s    deployment-controller  Scaled down replica set myapp-deployment-6f8c89fb9c to 1
+[cshakya@learndevops deployment]$ kubectl get replicaset
+NAME                          DESIRED   CURRENT   READY   AGE
+myapp-deployment-6f8c89fb9c   0         0         0       31m
+myapp-deployment-f5877d47b    5         5         5       31s
+[cshakya@learndevops deployment]$
+
+##########################################################
+24: update the image of container in deployment using command line 
+
+syntax - kubectl set image deployment <deployment name> <name of container>=<new_image>
+
+e.g. kubectl set image deployment myapp-deployment nginx-container=1.20-alpine
+
+-------------example deployment.yaml -----------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  labels:
+    tier: front-end
+    app: nginx
+spec:
+  selector:
+      matchLabels:
+        app: myapp #pod lable match 1
+  replicas: 5
+  template:
+    metadata:  # Pod meta data
+      name: nginx-pod_deployment
+      labels:
+        app: myapp # POD Lable which is matching in replcia set 1
+    spec:   #pod container specifiacation
+      containers:
+        - name: nginx-container
+          image: nginx
+------------------------------------------------
+##########################################################
+25: undo rollout deploymet 
+
+[cshakya@learndevops deployment]$ kubectl rollout undo deployment/myapp-deployment
+deployment.apps/myapp-deployment rolled back
+[cshakya@learndevops deployment]$ kubectl rollout history deployment/myapp-deployment
+deployment.apps/myapp-deployment
+REVISION  CHANGE-CAUSE
+5         kubectl set image deployment myapp-deployment nginx-container=nginx:1.20-alpine --record=true
+6         kubectl set image deployment myapp-deployment nginx-container=nginx:1.20-alpine --record=true
+
+[cshakya@learndevops deployment]$ kubectl get replicaset
+NAME                          DESIRED   CURRENT   READY   AGE
+myapp-deployment-6f8c89fb9c   3         3         3       2m8s
+myapp-deployment-7657b57496   4         4         1       5m15s
+[cshakya@learndevops deployment]$
+------------------------------
+---------------describe deployment show the logs that old replicaset activated --------------
+------------------------------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   myapp-deployment-7657b57496 (5/5 replicas created)
+Events:
+  Type    Reason             Age                   From                   Message
+  ----    ------             ----                  ----                   -------
+  Normal  ScalingReplicaSet  57m                   deployment-controller  Scaled up replica set myapp-deployment-6f8c89fb9c to 5
+  Normal  ScalingReplicaSet  26m                   deployment-controller  Scaled up replica set myapp-deployment-f5877d47b to 2
+  Normal  ScalingReplicaSet  26m                   deployment-controller  Scaled down replica set myapp-deployment-6f8c89fb9c to 4
+  Normal  ScalingReplicaSet  26m                   deployment-controller  Scaled up replica set myapp-deployment-f5877d47b to 3
+  Normal  ScalingReplicaSet  26m                   deployment-controller  Scaled down replica set myapp-deployment-6f8c89fb9c to 3
+  Normal  ScalingReplicaSet  26m                   deployment-controller  Scaled up replica set myapp-deployment-f5877d47b to 4
+  Normal  ScalingReplicaSet  26m                   deployment-controller  Scaled down replica set myapp-deployment-6f8c89fb9c to 2
+  Normal  ScalingReplicaSet  26m                   deployment-controller  Scaled up replica set myapp-deployment-f5877d47b to 5
+  Normal  ScalingReplicaSet  26m                   deployment-controller  Scaled down replica set myapp-deployment-6f8c89fb9c to 1
+  Normal  ScalingReplicaSet  26m                   deployment-controller  Scaled down replica set myapp-deployment-6f8c89fb9c to 0
+  Normal  ScalingReplicaSet  3m54s (x20 over 19m)  deployment-controller  (combined from similar events): Scaled down replica set myapp-deployment-7657b57496 to 1
+
+##########################################################
+
+26: accesing POD using interactive shell 
+
+kubectl exec -it myapp-deployment-7657b57496-584qf /bin/sh
+kubectl exec --stdin --tty myapp-deployment-7657b57496-584qf -- /bin/sh
+
+##########################################################
