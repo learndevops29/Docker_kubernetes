@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: myapp-service
 spec:
-  type: NodePort
+  type: NodePort   #Nodeport which will be accessible from outside POD
   ports:
     - port: 80
       targetPort: 80

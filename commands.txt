@@ -228,3 +228,46 @@ kubectl exec -it myapp-deployment-7657b57496-584qf /bin/sh
 kubectl exec --stdin --tty myapp-deployment-7657b57496-584qf -- /bin/sh
 
 ##########################################################
+31/07/2021
+##########################################################
+NodePort Range is 30000 to 32767
+----------------------------------
+27 : display service 
+
+minikube service <servicename> --url
+
+[cshakya@learndevops deployment]$ minikube service myapp-service --url
+http://192.168.49.2:30004
+
+
+##########################################################
+
+28 : usingcluster infor to find IP
+
+kubectl	cluster-info
+kubectl describe service <servicename>
+-----------------------ll
+
+[cshakya@learndevops deployment]$ kubectl describe service kubernetes
+Name:              kubernetes
+Namespace:         default
+Labels:            component=apiserver
+                   provider=kubernetes
+Annotations:       <none>
+Selector:          <none>
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.96.0.1
+IPs:               10.96.0.1
+Port:              https  443/TCP
+TargetPort:        8443/TCP
+Endpoints:         192.168.49.2:8443
+Session Affinity:  None
+Events:            <none>
+[cshakya@learndevops deployment]$
+
+----------
+
+
+
