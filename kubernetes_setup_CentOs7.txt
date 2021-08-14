@@ -1,0 +1,169 @@
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.1.200:6443 --token 5l8pbv.fkazg5c4xo8oei3p \
+        --discovery-token-ca-cert-hash sha256:43d6779f2b60e539e50c8645be86827bdba69f2a11004f8bf5ed3b174dc61d4a
+
+===============
+
+sed -i 's/cgroup-driver=cgroupfs/cgroup-driver=systemd/g' /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+https://www.techrepublic.com/article/how-to-install-a-kubernetes-cluster-on-centos-7/
+https://phoenixnap.com/kb/how-to-install-kubernetes-on-centos
+
+-==========
+installation :- step 1 to 6 on master and worker
+1. Disable SELinux and swap
+setenforce 0
+sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+swapoff -a
+vim /etc/fstab and hash out swap
+2. Enable br_netfilter
+
+modprobe br_netfilter
+echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+
+3. Install Docker and other tools 
+
+yum install -y yum-utils device-mapper-persistent-data lvm2
+
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+yum install -y docker-ce
+
+sudo usermod -a -G docker $USER
+
+sudo mkdir /etc/docker
+cat <<EOF | sudo tee /etc/docker/daemon.json
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
+
+mkdir -p /etc/systemd/system/docker.service.d ; systemctl daemon-reload ; systemctl restart docker ; systemctl enable docker
+
+4. install kubernetes on all nodes , create a repo /etc/yum.repos.d/kubernetes.repo
+
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+5. yum install -y kubelet kubeadm kubectl
+
+6. enable docker and kubetel 
+
+systemctl enable docker kubelet ; systemctl start docker kubelet 
+
+7. ( master) open ports in firewalld
+
+sudo firewall-cmd --permanent --add-port=6443/tcp
+sudo firewall-cmd --permanent --add-port=2379-2380/tcp
+sudo firewall-cmd --permanent --add-port=10250/tcp
+sudo firewall-cmd --permanent --add-port=10251/tcp
+sudo firewall-cmd --permanent --add-port=10252/tcp
+sudo firewall-cmd --permanent --add-port=10255/tcp
+
+
+firewall-cmd --zone=public --permanent --add-port={6443,2379-2380,10250,10251,10252,10255}/tcp
+sudo firewall-cmd --reload
+
+8. ( worker) -open ports in firewall
+firewall-cmd --permanent --add-port=10250/tcp
+sudo firewall-cmd --permanent --add-port=10251/tcp
+sudo firewall-cmd --permanent --add-port=10255/tcp
+
+firewall-cmd --zone=public --permanent --add-port={10250,10251,10252}/tcp
+firewall-cmd --reload
+
+9. ( master) initialize kubernetes clusetr 
+
+kubeadm init --apiserver-advertise-address=192.168.1.200 --pod-network-cidr=192.168.1.0/16
+
+***here apiserver-advertise-address=192.168.1.200 is my master server IP 
+
+
+
+10.(master)  follow below on master as normal user ( other than root ) 
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+11 .(MASTER) ( optional if you use root)  Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+12. (master) - Deploy flannel network  ( Set Up Pod Network ) *** used flannel here
+
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+13. ( worker )Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.1.200:6443 --token 5l8pbv.fkazg5c4xo8oei3p \
+        --discovery-token-ca-cert-hash sha256:43d6779f2b60e539e50c8645be86827bdba69f2a11004f8bf5ed3b174dc61d4a
+
+kubeadm join 192.168.1.200:6443 --token 5l8pbv.fkazg5c4xo8oei3p --discovery-token-ca-cert-hash sha256:43d6779f2b60e539e50c8645be86827bdba69f2a11004f8bf5ed3b174dc61d4a
+14 restart kublet on each server 
+
+15. now check kubectl get nodes
+output :-
+[cshakya@kubernetes ~]$ kubectl get nodes
+NAME                        STATUS     ROLES                  AGE     VERSION
+kubernetes.manitest.com     Ready      control-plane,master   43m     v1.21.0
+kubernetesw1.manitest.com   Ready      <none>                 8m14s   v1.21.0
+kubernetesw2.manitest.com   NotReady   <none>                 27s     v1.21.0
+
+
+16 . kubectl get pods --all-namespaces
+
+NAMESPACE     NAME                                              READY   STATUS              RESTARTS   AGE
+kube-system   coredns-558bd4d5db-k62ng                          1/1     Running             0          43m
+kube-system   coredns-558bd4d5db-lh55c                          1/1     Running             0          43m
+kube-system   etcd-kubernetes.manitest.com                      1/1     Running             0          43m
+kube-system   kube-apiserver-kubernetes.manitest.com            1/1     Running             0          43m
+kube-system   kube-controller-manager-kubernetes.manitest.com   1/1     Running             0          43m
+kube-system   kube-flannel-ds-dvfl6                             1/1     Running             0          41m
+kube-system   kube-flannel-ds-l5zqb                             0/1     Init:0/1            0          34s
+kube-system   kube-flannel-ds-pwvhz                             1/1     Running             0          8m21s
+kube-system   kube-proxy-jsj9f                                  1/1     Running             0          43m
+kube-system   kube-proxy-pccqh                                  0/1     ContainerCreating   0          34s
+kube-system   kube-proxy-rwlkw                                  1/1     Running             0          8m21s
+kube-system   kube-scheduler-kubernetes.manitest.com            1/1     Running             0          43m
+
+
+
+
+========
+
+https://stackoverflow.com/questions/53525975/kubernetes-error-uploading-crisocket-timed-out-waiting-for-the-condition
+
+https://computingforgeeks.com/join-new-kubernetes-worker-node-to-existing-cluster/
+
+kubeadm token create --print-join-command
+==============================15-08-21===
+https://www.youtube.com/watch?v=E3h8_MJmkVU
