@@ -1,0 +1,72 @@
+18-08-201
+Dockerfile contain CMD which get executed at last when docjer container get created
+-----------
+FROM ubuntu 
+
+CMD ["sleep", "5"]   # CMD is array and should contain array type formated cannot use ["sleep 6"]
+---------------
+
+-----------
+FROM ubuntu
+
+ENTRYPOINT ["sleep"]  # command
+
+CMD["5"]    #argument
+------------------
+eg, if we want to overrride the entrypoint 
+docker run --entrypoint sleep2.0 ubuntu-sleeper 10
+==========================================
+
+####################
+in below example 
+ENTRYPOINT in docker is equivelent to command in kubernetes
+CMD in docker is equivelent to args in kubernetes 
+####################
+apiversion: v1
+kind Pod
+metdata:
+  name: ubuntu-sleepr-pod
+spec:
+  - name: ubuntu-sleepr
+    image: ubuntu-sleepr
+    command: ["sleep2.0]  # only array need to be passes 
+    args: ["10"]
+
+-----------------------------
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-sleeper-3
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command:
+      - "sleep"
+      - "1200"
+
+-----------------
+
+####################
+ConfigMap is to define environment variable in kubernetes containers 
+####################
+
+Usage:
+  kubectl create configmap NAME [--from-file=[key=]source] [--from-literal=key1=value1] [--dry-run=server|client|none]
+Examples:
+  # Create a new configmap named my-config based on folder bar
+  kubectl create configmap my-config --from-file=path/to/bar
+
+  # Create a new configmap named my-config with specified keys instead of file basenames on disk
+  kubectl create configmap my-config --from-file=key1=/path/to/bar/file1.txt --from-file=key2=/path/to/bar/file2.txt
+
+  # Create a new configmap named my-config with key1=config1 and key2=config2
+  kubectl create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2
+
+  # Create a new configmap named my-config from the key=value pairs in the file
+  kubectl create configmap my-config --from-file=path/to/bar
+
+  # Create a new configmap named my-config from an env file
+  kubectl create configmap my-config --from-env-file=path/to/bar.env
+
