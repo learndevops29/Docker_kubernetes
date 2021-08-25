@@ -331,4 +331,18 @@ Usage:
   kubectl create configmap NAME [--from-file=[key=]source] [--from-literal=key1=value1] [--dry-run=server|client|none]
 
 
+######################################
+19-08-2021
+######################################
 
+35. explain or help in kubectl 
+
+kubectl explain pods --recursive | grep envFrom -A3   #display last 3 lines 
+##########################################################
+secret 
+
+36. 
+
+Usage:
+  kubectl create secret generic NAME [--type=string] [--from-file=[key=]source] [--from-literal=key1=value1]
+[--dry-run=server|client|none] [options]

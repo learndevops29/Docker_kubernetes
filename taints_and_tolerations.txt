@@ -1,0 +1,65 @@
+20-08-21
+###########################
+taint and tolerance in kubernetes
+
+taint apply on Node
+tolerant apply on pod
+
+tolerant pod only get deploy to tainted Node 
+==============================
+
+Syntax : kubectl taint nodes node-name key=value:taint-effect
+
+taint-effect -- what happenes to PODs that DO NOT TOLERARTE this taint ?
+- NoSchedule
+- PreferNoSchedule
+- NoExecute = it will kill any existing non toleration pod
+
+e.g. 
+
+kubectl taint node node1 app=blue:NoSchedule
+
+same has to be apply on POD :-
+--------------------------------
+pod-definition.yml
+-----------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containeres:
+    - name: nginix-container
+      image: nginx
+  tolerations:
+    - key: "app"
+      operator: "Equal"
+      value: "blue"
+      effect: "NoSchedule"
+--------------------------
+ 
+untain a node :-
+
+ubectl taint nodes controlplane node-role.kubernetes.io/master:NoSchedule-
+
+
+(-) minus in last is the command to do that 
+
+#################
+
+created the taint on node01
+
+kubectl taint node node01 spray=mortein:NoSchedule
+
+####################################
+TIP:--
+
+kubectl explain pod --recursive | grep -A5 tolerations 
+
+[cshakya@learndevops ~]$ kubectl explain pod --recursive | grep -A5 tolerations
+      tolerations       <[]Object>
+         effect <string>
+         key    <string>
+         operator       <string>
+         tolerationSeconds      <integer>
+         value  <string>
