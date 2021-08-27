@@ -1,0 +1,86 @@
+25-08-2021
+==========
+Node SELECTOR :-
+
+Label the node :-
+
+# kubectl label nodes <node-name> <label-key>=<label-value>
+e.g.
+kubectl label nodes knode01 size=large
+
+------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containers:
+    - name: data-processor
+      image: data-processor
+  nodeSelector:
+    size: Large
+----------------  
+###############################
+NODE AFFINITY  26-08-21
+################################## 
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: color
+                operator: In
+                values:
+                - blue
+========================
+Create a new deployment named red with the nginx image and 2 replicas, and ensure it gets placed on the controlplane node only.
+
+Use the label - node-role.kubernetes.io/master - set on the controlplane node.
+
+CheckCompleteIncomplete
+====================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: red
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: Exists
