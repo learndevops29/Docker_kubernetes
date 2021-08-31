@@ -7,7 +7,12 @@ Label the node :-
 # kubectl label nodes <node-name> <label-key>=<label-value>
 e.g.
 kubectl label nodes knode01 size=large
+===============
+Show Lablel command :-
+================
 
+kubectl get nodes node01 --show-labels
+#################################################
 ------------
 apiVersion: v1
 kind: Pod

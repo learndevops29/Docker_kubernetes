@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app
+  namespace: elastic-stack
+  labels:
+    name: app
+spec:
+  containers:
+  - name: app
+    image: kodekloud/event-simulator
+    volumeMounts:
+    - mountPath: /log
+      name: log-volume
+
+  - name: sidecar
+    image: kodekloud/filebeat-configured
+    volumeMounts:
+    - mountPath: /var/log/event-simulator/
+      name: log-volume
+
+  volumes:
+  - name: log-volume
+    hostPath:
+      # directory location on host
+      path: /var/log/webapp
+      # this field is optional
+      type: DirectoryOrCreate
+==================
+reading logs in pod under namespace 
+############
+kubectl -n elastic-stack exec -it app cat /log/app.log
+or
+kubect;l -n elastic-stack logs app
+##########
+Logging of container 
+
+kubectl logs yellow gold
+
+here-- yellow is pod
+ -- gold is contaner 
+
+root@controlplane:~# kubectl logs yellow gold
+1:C 27 Aug 2021 17:49:53.358 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:C 27 Aug 2021 17:49:53.358 # Redis version=6.2.5, bits=64, commit=00000000, modified=0, pid=1, just started
+1:C 27 Aug 2021 17:49:53.358 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+1:M 27 Aug 2021 17:49:53.359 * monotonic clock: POSIX clock_gettime
+1:M 27 Aug 2021 17:49:53.361 * Running mode=standalone, port=6379.
+1:M 27 Aug 2021 17:49:53.363 # Server initialized
+1:M 27 Aug 2021 17:49:53.365 * Ready to accept connections
+root@controlplane:~# 
