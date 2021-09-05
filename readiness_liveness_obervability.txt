@@ -1,0 +1,103 @@
+01-09-2021
+##############
+POD status :-
+--------------
+PodScheduled
+Initialized
+ContainersReady
+Ready
+################
+apiversion: v1
+kind: Pod
+metdata:
+  name: simple-webapp
+  labels:
+    name: simple-webapp
+spec:
+  containers:
+  - name: simple-webapp
+    image: simple-webapp
+    ports:
+      - containerPort: 8080
+    readineissProbe:
+      httpGet:
+        path: /api/ready
+        port: 8080
+
+
+#############
+Types of PROBE
+##############
+-----------------
+readinessProbe:
+  httpdGet:
+    path: /api/ready
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 8 
+
+NOTE -- by default failure threshold is 3 
+------------
+readinessProbe:
+  tcpSocket:
+    port: 3306
+
+---------------
+readinessProbe:
+  exec:
+    command:
+      - cat
+      - /app/is_ready
+
+===============$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$+++++++++++++
+Liveness PROBE
+=================== Liveness probe is to check staus of running pod application health 
+
+livenessProbe:
+  httpdGet:
+    path: /api/ready
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 8 
+
+NOTE -- by default failure threshold is 3 
+------------
+livenessProbe:
+  tcpSocket:
+    port: 3306
+
+---------------
+livenessProbe:
+  exec:
+    command:
+      - cat
+      - /app/is_ready
+
+###############################
+##### webapp2.yaml #######
+
+piVersion: v1
+kind: Pod
+metadata:
+   name: simple-webapp-2
+   labels:
+     name: simple-webapp
+spec:
+  containers:
+  - image: kodekloud/webapp-delayed-start
+    name: simple-webapp
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+    livenessProbe:
+      httpGet:
+        path: /live
+        port: 8080
+      initialDelaySeconds: 80
+      periodSeconds: 1

@@ -1,0 +1,57 @@
+1-09-2021
+=============
+
+docker logs <containerID>
+=========================================
+Kubernetes --
+
+kubectl logs -f <podname>  # f- option is like tail -f (latest logs) 
+===================================
+in case of multicontainer POD 
+
+kubectl logs -f <podName> <containerName>
+=======================================
+##################################
+Monitor and Debugging Applications 
+##################################
+METRIC SERVER -- monitoring solution -in-memory
+
+
+minikube addons enable metrics-server 
+
+===========
+
+for other cloning the git repo metric-server.git
+git clone https://github.com/kodekloudhub/kubernetes-metrics-server.git
+
+
+#kubectl create -f deploy/1.8+/
+
+root@controlplane:~# kubectl create -f kubernetes-metrics-server/
+clusterrole.rbac.authorization.k8s.io/system:aggregated-metrics-reader created
+clusterrolebinding.rbac.authorization.k8s.io/metrics-server:system:auth-delegator created
+rolebinding.rbac.authorization.k8s.io/metrics-server-auth-reader created
+apiservice.apiregistration.k8s.io/v1beta1.metrics.k8s.io created
+serviceaccount/metrics-server created
+deployment.apps/metrics-server created
+service/metrics-server created
+clusterrole.rbac.authorization.k8s.io/system:metrics-server created
+clusterrolebinding.rbac.authorization.k8s.io/system:metrics-server created
+root@controlplane:~# 
+
+#####################################
+To view the CPU and Memory consuption by nodes
+
+kubectl top node
+
+kubectl top node --sort-by='cpu' --no-headers | head -1
+------------------
+for POD
+------------------
+kubectl top pod
+
+kubectl top pod --sort-by='memory' --no-headers | head -1
+NOTE -- This will only work when you have Metric API enabled 
+error: Metrics API not available
+
+
