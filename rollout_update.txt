@@ -1,0 +1,36 @@
+8-Sept-21
+#########
+CREATE
+kubectl create -f deployment-definition.yaml
+--------------
+GET
+
+kubectl get deployments
+--------------------
+UPDATE - pod to new version 
+
+1. kubectl apply -f deployment-definition.yaml 
+
+2. without updating file
+
+kubectl set image deployment/myapp-deployment nginx=nginx:1.9.1
+
+------------------
+STATUS
+1. kubectl rollout status deployment/myapp-deployment
+2. kubectl rollout history deployment/myapp-deployment
+
+------------
+ROLLBACK
+
+kubectl rollout undo deployment/myapp-deployment
+=====###############
+10-09-21
+###########
+record the deployment 
+
+kubectl apply -f deployment-definition.yaml --record 
+#############
+rollback it 
+
+kubectl rollout undo deployment/myapp-deployment
