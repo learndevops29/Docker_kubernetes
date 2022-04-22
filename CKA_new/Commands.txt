@@ -1,0 +1,18 @@
+This is to display kubeadm supporting containers 
+
+1. kubectl get pods -n kube-system
+[cshakya@kmaster ~]$ kubectl get pods -n kube-system
+NAME                                                READY   STATUS    RESTARTS        AGE
+coredns-64897985d-78xjh                             1/1     Running   5 (4m46s ago)   28d
+coredns-64897985d-9n8qq                             1/1     Running   5 (4m46s ago)   28d
+etcd-kmaster.cloudenthumani.in                      1/1     Running   5 (4m46s ago)   28d
+kube-apiserver-kmaster.cloudenthumani.in            1/1     Running   5 (4m46s ago)   28d
+kube-controller-manager-kmaster.cloudenthumani.in   1/1     Running   5 (4m46s ago)   28d
+kube-flannel-ds-7sk49                               1/1     Running   5 (4m38s ago)   28d
+kube-flannel-ds-d7bcq                               1/1     Running   5 (4m26s ago)   28d
+kube-flannel-ds-xkz8m                               1/1     Running   5 (4m46s ago)   28d
+kube-proxy-2lj7n                                    1/1     Running   5 (4m26s ago)   28d
+kube-proxy-hr2fq                                    1/1     Running   5 (4m46s ago)   28d
+kube-proxy-mhtkv                                    1/1     Running   5 (4m38s ago)   28d
+kube-scheduler-kmaster.cloudenthumani.in            1/1     Running   5 (4m46s ago)   28d
+[cshakya@kmaster ~]$
