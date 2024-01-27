@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mywebserver 
+  name: mywebserver 
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webserver
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: webserver
+        tool: flask
+    spec:
+      containers:
+      - image: learndevops29/maniswebapp:light 
+        name: maniswebapp
+        resources: {}
+status: {}
